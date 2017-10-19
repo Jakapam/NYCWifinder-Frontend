@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
+import MapComponent from './components/MapComponent'
 import logo from './logo.svg';
+import { Button, Grid } from 'semantic-ui-react'
+import GAPIKEY from './private'
+import hotspots from './hotspots'
 import './App.css';
 
 class App extends Component {
+
+
   render() {
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div style={{height: 1000, width: 700}}>
+        <MapComponent apiKey={GAPIKEY} hotspots= {hotspots}/>
       </div>
     );
   }
