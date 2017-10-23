@@ -1,25 +1,6 @@
-import React, { Component } from 'react';
-import InfoBox from './InfoBox'
+import React from 'react';
 
-export default class Marker extends Component{
-
-  state= {
-    displayInfoBox: false
-  }
-
-  handleMouseEnter = ()=>{
-    this.setState({
-      displayInfoBox: true
-    })
-  }
-
-  handleMouseLeave = ()=>{
-    this.setState({
-      displayInfoBox: false
-    })
-  }
-
-  render(){
+const Marker = ()=>{
 
     const markerStyle = {
       position: 'fixed',
@@ -31,12 +12,8 @@ export default class Marker extends Component{
       zIndex: 0,
     }
 
-    return <div
-      style={markerStyle}
-      onMouseEnter={this.handleMouseEnter}
-      onMouseLeave={this.handleMouseLeave}
-      >
-      {this.state.displayInfoBox ? <InfoBox hotspotData= {this.props.hotspotData}/> : null}
-    </div>;
+    return <div style={markerStyle}></div>;
   }
-}
+
+
+export default Marker

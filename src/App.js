@@ -12,7 +12,7 @@ class App extends Component {
   render() {
 
     return (
-      <div style={{height: 700, width: 700}}>
+      <div style={{height: 700, width: 1000}}>
         <MapComponent apiKey={GAPIKEY} hotspots= {hotspots}/>
       </div>
     );
