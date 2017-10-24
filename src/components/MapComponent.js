@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import InfoBox from './InfoBox'
+import haversineDistance from '../haversine.js'
 import Marker from './Marker'
 import UserMarker from './UserMarker'
 import GoogleMap from 'google-map-react';
@@ -7,7 +8,6 @@ import GoogleMap from 'google-map-react';
 export default class MapComponent extends Component {
 
   state={
-    userMarkerToggle: false,
     userMarkerLat: 40.7829,
     userMarkerLng: -73.9654,
     displayInfoBox: false,
@@ -32,7 +32,6 @@ export default class MapComponent extends Component {
     this.setState({
       userMarkerLat: position.coords.latitude,
       userMarkerLng: position.coords.longitude,
-      center: {lat: position.coords.latitude, lng: position.coords.longitude},
       zoom: 15
     })
   }
@@ -54,11 +53,10 @@ export default class MapComponent extends Component {
   }
 
   handleClick = (obj)=>{
-    console.log(obj)
     this.setState({
-      userMarkerToggle: !this.state.userMarkerToggle,
       userMarkerLat: obj.lat,
-      userMarkerLng: obj.lng
+      userMarkerLng: obj.lng,
+      center: {lat: obj.lat, lng: obj.lng}
     })
   }
 
@@ -72,21 +70,69 @@ export default class MapComponent extends Component {
 
   render() {
 
-    const filteredMarkerList = this.state.hotspotData.filter((hotspot)=>
+    let markerDisplay
+    let dynamicCenter
+
+    if(this.props.filter==="All Hotspots within 1000 feet"){
+      markerDisplay = this.state.hotspotData.filter((hotspot)=>
       {
-        return Math.sqrt(Math.pow(this.state.userMarkerLat - hotspot.latitude, 2)+Math.pow(this.state.userMarkerLng - hotspot.longitude, 2)) < .01
+        return haversineDistance([this.state.userMarkerLng ,this.state.userMarkerLat],[hotspot.longitude,hotspot.latitude]) < 0.3048
+      })
+      dynamicCenter = {lat: this.state.userMarkerLat, lng: this.state.userMarkerLng}
+
+    }else if (this.props.filter==="Closest WiFi Hotspot"){
+      markerDisplay = this.state.hotspotData.reduce((p, v)=> {
+
+        let pDistance = haversineDistance([this.state.userMarkerLng ,this.state.userMarkerLat],[p.longitude,p.latitude])
+        let vDistance = haversineDistance([this.state.userMarkerLng ,this.state.userMarkerLat],[v.longitude,v.latitude])
+
+        return ( pDistance < vDistance ? p : v );
+      })
+
+      dynamicCenter = {lat: ((this.state.userMarkerLat + markerDisplay.latitude)/2), lng: ((this.state.userMarkerLng + markerDisplay.longitude)/2)}
+
+    } else {
+
+      if(this.state.hotspotData.length > 0){
+        let chargingStations = this.state.hotspotData.filter((hotspot)=>
+        {
+          if( hotspot.service_options !== null ){
+            return hotspot.service_options.includes("phone")
+          } else {
+            return false
+          }
+        })
+
+        markerDisplay = chargingStations.reduce((p, v)=> {
+
+          let pDistance = haversineDistance([this.state.userMarkerLng ,this.state.userMarkerLat],[p.longitude,p.latitude])
+          let vDistance = haversineDistance([this.state.userMarkerLng ,this.state.userMarkerLat],[v.longitude,v.latitude])
+
+          return ( pDistance < vDistance ? p : v );
+        })
+
+        dynamicCenter = {lat: ((this.state.userMarkerLat + markerDisplay.latitude)/2), lng: ((this.state.userMarkerLng + markerDisplay.longitude)/2)}
+
+      } else {
+        markerDisplay = []
       }
-    )
 
+    }
 
-    const markerList = filteredMarkerList.map((hotspot, index)=>
+    const markerList = Array.isArray(markerDisplay) ? markerDisplay.map((hotspot, index)=>{
+      return <Marker
+        key={index}
+        lat={hotspot.latitude}
+        lng={hotspot.longitude}
+        hotspotData = {hotspot}
+      />
+    })
+    :
     <Marker
-      key={index}
-      lat={hotspot.latitude}
-      lng={hotspot.longitude}
-      hotspotData = {hotspot}
+      lat={markerDisplay.latitude}
+      lng={markerDisplay.longitude}
+      hotspotData = {markerDisplay}
     />
-    )
 
     return (
       <GoogleMap
@@ -94,7 +140,7 @@ export default class MapComponent extends Component {
         onChildMouseLeave={this.childMouseLeave}
         onChildClick={this.childClickWorkaround}
         onClick={this.handleClick}
-        center={this.state.center}
+        center={dynamicCenter || this.state.center}
         margin={[30,30,30,30]}
         zoom={this.state.zoom}
         bootstrapURLKeys={{

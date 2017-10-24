@@ -27,6 +27,7 @@ const InfoBox = (props)=>{
    )
   }
 
+
   return(
     displayDiv
   )

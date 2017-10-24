@@ -5,10 +5,10 @@ const Marker = ()=>{
     const markerStyle = {
       position: 'fixed',
       borderRadius: '50%',
-      border: '2px solid red',
-      background: 'white',
-      width: 10,
-      height: 10,
+      border: '1px solid black',
+      background: 'red',
+      width: 12,
+      height: 12,
       zIndex: 0,
     }
 
