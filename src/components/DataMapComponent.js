@@ -3,6 +3,7 @@ import GoogleMap from 'google-map-react';
 import { Link } from 'react-router-dom';
 import { Button, Form, Grid } from 'semantic-ui-react';
 import Marker from './Marker'
+import fetchHotspots from '../adapter'
 
 export default class DataMapContainer extends Component{
 
@@ -16,13 +17,11 @@ export default class DataMapContainer extends Component{
   }
 
   componentDidMount(){
-    fetch('http://localhost:3000/zipcodes')
-      .then(res=> res.json())
+    fetchHotspots('zipcodes')
       .then(json=> this.setState({
         validZips: json
       }))
-    fetch('http://localhost:3000/hotspots')
-      .then(res=> res.json())
+    fetchHotspots('hotspots')
       .then(json=> this.setState({
         hotspotData: json
       }))
@@ -39,7 +38,6 @@ export default class DataMapContainer extends Component{
 
   handleQueryChange= (e, {value})=>{
 
-
     this.setState({
       filterQuery: value
     })
@@ -49,15 +47,13 @@ export default class DataMapContainer extends Component{
   handleSubmit = ()=>{
 
     if(this.state.filterOption === 'all'){
-      fetch('http://localhost:3000/hotspots')
-        .then(res=> res.json())
+      fetchHotspots('hotspots')
         .then(json=> this.setState({
           hotspotData: json,
           zoom: 11
         }))
     } else {
-      fetch(`http://localhost:3000/${this.state.filterOption}/${this.state.filterQuery}`)
-      .then(res=> res.json())
+      fetchHotspots(this.state.filterOption,this.state.filterQuery)
       .then(json=> this.setState({
         hotspotData: json,
         zoom: this.state.filterOption === 'zipcodes' ? 15 : 11
@@ -141,12 +137,14 @@ export default class DataMapContainer extends Component{
 
     if (this.state.filterOption === 'boroughs'){
       inputDisplay= <Form.Select
+        inline
         options={boroughOptions}
         value={this.state.filterQuery}
         onChange={this.handleQueryChange}
       />
     } else if(this.state.filterOption === 'zipcodes'){
       inputDisplay= <Form.Select
+        inline
         search
         options={zipcodeOptions}
         value={this.state.filterQuery}

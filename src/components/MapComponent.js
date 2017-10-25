@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import InfoBox from './InfoBox'
-import haversineDistance from '../haversine.js'
-import Marker from './Marker'
-import UserMarker from './UserMarker'
+import InfoBox from './InfoBox';
+import haversineDistance from '../haversine.js';
+import Marker from './Marker';
+import UserMarker from './UserMarker';
 import GoogleMap from 'google-map-react';
+import fetchHotspots from '../adapter';
 
 export default class MapComponent extends Component {
 
@@ -21,8 +22,7 @@ export default class MapComponent extends Component {
 
   componentDidMount(){
     navigator.geolocation.getCurrentPosition(this.setBrowserCoordinates)
-    fetch('http://localhost:3000/hotspots')
-      .then(res=> res.json())
+    fetchHotspots('hotspots')
       .then(json=> this.setState({
         hotspotData: json
       }))

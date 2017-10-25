@@ -39,20 +39,22 @@ export default class MapContainer extends Component{
 
     return(
       <div style={{height: '65vh' , width: '85vw', margin: 'auto'}}>
-        <Grid>
-          <Grid.Row>
-            <Button as={Link} to='/data'>Go to WiFi Stats</Button>
-            <span>
-              Showing
-              {' '}
-              <Dropdown inline
-                text={this.state.filter}
-                options={wifiOptions}
-                value={wifiOptions[0].value}
-                onChange = {this.handleChange}
-              />
-            </span>
-            <span>Current Location</span><span style={{position: "relative", right: -5, top: 4}}><UserMarker /></span>
+        <Grid verticalAlign="bottom">
+          <Grid.Row style={{marginBottom: 15}}>
+
+              <Button as={Link} to='/data'>Go to WiFi Stats</Button>
+              <span>
+                Showing
+                {' '}
+                <Dropdown inline
+                  text={this.state.filter}
+                  options={wifiOptions}
+                  value={wifiOptions[0].value}
+                  onChange = {this.handleChange}
+                />
+              </span>
+              <span>Current Location</span><span style={{position: "relative", right: -5, top: 4}}><UserMarker /></span>
+
           </Grid.Row>
         </Grid>
         <MapComponent apiKey={this.props.apiKey} filter={this.state.filter}/>
