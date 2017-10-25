@@ -3,8 +3,9 @@ import { Route } from 'react-router-dom'
 import { Image } from 'semantic-ui-react'
 import MapContainer from './components/MapContainer'
 import DataMapContainer from './components/DataMapComponent'
-import GAPIKEY from './private'
 import './App.css';
+
+const GAPIKEY = 'AIzaSyAeBzxk5nH66CsJ2QymXUCoW-niA4AYXWc'
 
 class App extends Component {
 
