@@ -1,6 +1,6 @@
-function fetchHotspots(option,query){
+function fetchHotspots(option,query=""){
 
-  return fetch(`http://localhost:3000/${option}/${query || ""}`)
+  return fetch(`http://localhost:3000/${option}/${query}`)
     .then(res=> res.json())
 }
 
