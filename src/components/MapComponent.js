@@ -21,7 +21,7 @@ export default class MapComponent extends Component {
 
   componentDidMount(){
     navigator.geolocation.getCurrentPosition(this.setBrowserCoordinates)
-    fetch('http://192.168.2.145:3000/hotspots')
+    fetch('http://localhost:3000/hotspots')
       .then(res=> res.json())
       .then(json=> this.setState({
         hotspotData: json

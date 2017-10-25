@@ -10,57 +10,58 @@ export default class DataMapContainer extends Component{
     center: {lat: 40.7829, lng: -73.9654},
     zoom: 11,
     filterOption: "all",
-    filterQuery: null,
-    hotspotData: []
+    filterQuery: "Manhattan",
+    hotspotData: [],
+    validZips: []
   }
 
   componentDidMount(){
-    fetch('http://192.168.2.145:3000/hotspots')
+    fetch('http://localhost:3000/zipcodes')
+      .then(res=> res.json())
+      .then(json=> this.setState({
+        validZips: json
+      }))
+    fetch('http://localhost:3000/hotspots')
       .then(res=> res.json())
       .then(json=> this.setState({
         hotspotData: json
       }))
   }
 
-  handleChange = (e, {value})=>{
+  handleOptionChange = (e, {value})=>{
 
     this.setState({
-      filterOption: value
+      filterOption: value,
+      filterQuery: value === 'zipcodes' ? 10001 : 'Manhattan'
     })
 
   }
 
   handleQueryChange= (e, {value})=>{
+
+
     this.setState({
       filterQuery: value
     })
+
   }
 
   handleSubmit = ()=>{
 
     if(this.state.filterOption === 'all'){
-      fetch('http://192.168.2.145:3000/hotspots')
+      fetch('http://localhost:3000/hotspots')
         .then(res=> res.json())
         .then(json=> this.setState({
-          hotspotData: json
+          hotspotData: json,
+          zoom: 11
         }))
     } else {
-      fetch(`http://192.168.2.145:3000/${this.state.filterOption}/${this.state.filterQuery}`)
+      fetch(`http://localhost:3000/${this.state.filterOption}/${this.state.filterQuery}`)
       .then(res=> res.json())
       .then(json=> this.setState({
-        hotspotData: json
+        hotspotData: json,
+        zoom: this.state.filterOption === 'zipcodes' ? 15 : 11
       }))
-    }
-
-
-    if(this.state.filterOption === 'zipcodes'){
-      this.setState({
-        zoom: 15
-      })
-    } else {
-      this.setState({
-        zoom: 11
-      })
     }
 
   }
@@ -126,14 +127,31 @@ export default class DataMapContainer extends Component{
       }
     ]
 
+    const zipcodeOptions= this.state.validZips.sort().map((zipcode)=>{
+
+      return{
+        text: zipcode === 83 ? 'Central Park' : zipcode,
+        key: zipcode,
+        value: zipcode
+      }
+    }
+    )
+
     let inputDisplay
 
     if (this.state.filterOption === 'boroughs'){
-      inputDisplay= <Form.Select options={boroughOptions} defaultValue={options[2].value} onChange={this.handleQueryChange}/>
+      inputDisplay= <Form.Select
+        options={boroughOptions}
+        value={this.state.filterQuery}
+        onChange={this.handleQueryChange}
+      />
     } else if(this.state.filterOption === 'zipcodes'){
-      inputDisplay= <Form.Input placeholder="Enter Zipcode" type='number' onChange={this.handleQueryChange}/>
+      inputDisplay= <Form.Select
+        search
+        options={zipcodeOptions}
+        value={this.state.filterQuery}
+        onChange={this.handleQueryChange}/>
     }
-
 
     return (
 
@@ -142,8 +160,8 @@ export default class DataMapContainer extends Component{
           <Grid.Row>
             <Form onSubmit={this.handleSubmit}>
               <Form.Group inline>
-                <Button size='medium' as={Link} to='/'>WiFinder</Button>
-                <Form.Select options={options} defaultValue={options[2].value} onChange= {this.handleChange} />
+                <Button size='medium' as={Link} to='/'>Go to WiFinder</Button>
+                <Form.Select options={options} defaultValue={options[2].value} onChange= {this.handleOptionChange} />
                 { inputDisplay }
                 <Form.Button>Show Hotspots</Form.Button>
               </Form.Group>

@@ -41,7 +41,7 @@ export default class MapContainer extends Component{
       <div style={{height: '65vh' , width: '85vw', margin: 'auto'}}>
         <Grid>
           <Grid.Row>
-            <Button as={Link} to='/data'>WiFi Stats</Button>
+            <Button as={Link} to='/data'>Go to WiFi Stats</Button>
             <span>
               Showing
               {' '}
